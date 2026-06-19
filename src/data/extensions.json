@@ -1,0 +1,53 @@
+{
+  "_license": "Apache-2.0",
+  "_copyright": "Copyright 2026 Sanjib Bayen",
+  "_spdx": "SPDX-License-Identifier: Apache-2.0",
+  "_author": "Sanjib Bayen",
+  
+  "installed": [
+    {
+      "id": "artificial-intelligence",
+      "name": "Artificial Intelligence",
+      "description": "Teaching computers to make slightly fewer mistakes.",
+      "icon": "Brain"
+    },
+    {
+      "id": "space-technology",
+      "name": "Space Technology",
+      "description": "Looking at the Moon and calling it research.",
+      "icon": "Orbit"
+    },
+    {
+      "id": "full-stack-engineering",
+      "name": "Full Stack Engineering",
+      "description": "Building things from database to deployment.",
+      "icon": "Code2"
+    },
+    {
+      "id": "quantum-computing",
+      "name": "Quantum Computing",
+      "description": "Entangling qubits for breakfast. Schrödinger's debugger included.",
+      "icon": "Atom"
+    }
+  ],
+  "discovering": [
+    {
+      "id": "robotics",
+      "name": "Robotics",
+      "description": "Making code interact with reality.",
+      "icon": "Cpu"
+    },
+    {
+      "id": "distributed-systems",
+      "name": "Distributed Systems",
+      "description": "One computer is never enough.",
+      "icon": "Network"
+    },
+    {
+      "id": "computer-graphics",
+      "name": "Computer Graphics",
+      "description": "Teaching pixels to behave.",
+      "icon": "Palette"
+    }
+  ]
+}

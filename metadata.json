@@ -1,0 +1,29 @@
+{
+  "_license": "Apache-2.0",
+  "_copyright": "Copyright 2026 Sanjib Bayen",
+  "_spdx": "SPDX-License-Identifier: Apache-2.0",
+  "_author": "Sanjib Bayen",
+  "_repository": "https://github.com/SanjibBayen/Sanjib-Bayen-Portfolio",
+  
+  "name": "Interactive IDE Portfolio of sanjib bayen",
+  "description": "A Custom-Themed Interactive Web IDE & Portfolio Platform replicating a local IDE workflow on the web — with cryptographic verification, AI-assisted terminal, and live telemetry.",
+  "author": {
+    "name": "Sanjib Bayen",
+    "email": "sanjibbayen11@gmail.com",
+    "url": "https://github.com/SanjibBayen"
+  },
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "techStack": {
+    "frontend": ["React 19", "TypeScript", "Vite", "TailwindCSS", "Motion"],
+    "backend": ["Express", "TypeScript", "esbuild"],
+    "security": ["Helmet.js", "Cloudflare Turnstile", "hpp"],
+    "ai": ["Google Gemini API"],
+    "email": ["Resend API"],
+    "telemetry": ["geoip-lite", "express-useragent"]
+  },
+  "deployment": {
+    "vercel": "https://sanjib-bayen.vercel.app",
+    "render": "https://sanjib-bayen.onrender.com"
+  }
+}
