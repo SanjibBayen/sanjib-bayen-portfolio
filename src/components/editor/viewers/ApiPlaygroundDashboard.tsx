@@ -66,77 +66,92 @@ interface ToastState {
 // CSRF Token Helper
 // ============================================
 function getCsrfToken(): string {
-  const cookies = document.cookie.split(';');
+  const cookies = document.cookie.split(";");
   for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'csrf_token') return value || '';
+    const [name, value] = cookie.trim().split("=");
+    if (name === "csrf_token") return value || "";
   }
-  return '';
+  return "";
 }
 
 // ============================================
 // JSON Syntax Highlighter
 // ============================================
 interface Token {
-  type: 'key' | 'string' | 'number' | 'boolean' | 'null' | 'punctuation' | 'whitespace' | 'text';
+  type:
+    | "key"
+    | "string"
+    | "number"
+    | "boolean"
+    | "null"
+    | "punctuation"
+    | "whitespace"
+    | "text";
   value: string;
 }
 
 function tokenizeJson(input: string): Token[] {
   const tokens: Token[] = [];
   let index = 0;
-  
+
   const stringRegex = /^"(?:[^"\\]|\\.)*"/;
   const numberRegex = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
   const wordRegex = /^(true|false|null)/;
   const whitespaceRegex = /^\s+/;
-  
+
   while (index < input.length) {
     const remaining = input.slice(index);
-    
+
     let match = remaining.match(whitespaceRegex);
     if (match) {
-      tokens.push({ type: 'whitespace', value: match[0] });
+      tokens.push({ type: "whitespace", value: match[0] });
       index += match[0].length;
       continue;
     }
-    
+
     const char = remaining[0];
-    if (char === ':' || char === ',' || char === '{' || char === '}' || char === '[' || char === ']') {
-      tokens.push({ type: 'punctuation', value: char });
+    if (
+      char === ":" ||
+      char === "," ||
+      char === "{" ||
+      char === "}" ||
+      char === "[" ||
+      char === "]"
+    ) {
+      tokens.push({ type: "punctuation", value: char });
       index++;
       continue;
     }
-    
+
     match = remaining.match(stringRegex);
     if (match) {
       const strVal = match[0];
       const afterStr = remaining.slice(strVal.length);
       const isKey = /^\s*:/.test(afterStr);
-      tokens.push({ type: isKey ? 'key' : 'string', value: strVal });
+      tokens.push({ type: isKey ? "key" : "string", value: strVal });
       index += strVal.length;
       continue;
     }
-    
+
     match = remaining.match(numberRegex);
     if (match) {
-      tokens.push({ type: 'number', value: match[0] });
+      tokens.push({ type: "number", value: match[0] });
       index += match[0].length;
       continue;
     }
-    
+
     match = remaining.match(wordRegex);
     if (match) {
       const val = match[0];
-      tokens.push({ type: val === 'null' ? 'null' : 'boolean', value: val });
+      tokens.push({ type: val === "null" ? "null" : "boolean", value: val });
       index += val.length;
       continue;
     }
-    
-    tokens.push({ type: 'text', value: char });
+
+    tokens.push({ type: "text", value: char });
     index++;
   }
-  
+
   return tokens;
 }
 
@@ -145,28 +160,64 @@ function renderColorfulTokens(rawText: string): React.ReactNode {
   const tokens = tokenizeJson(rawText);
   return tokens.map((token, i) => {
     switch (token.type) {
-      case 'key':
-        return <span key={i} className="text-[#9cdcfe] font-semibold">{token.value}</span>;
-      case 'string':
-        return <span key={i} className="text-[#ce9178]">{token.value}</span>;
-      case 'number':
-        return <span key={i} className="text-[#b5cea8]">{token.value}</span>;
-      case 'boolean':
-        return <span key={i} className="text-[#569cd6] font-bold">{token.value}</span>;
-      case 'null':
-        return <span key={i} className="text-gray-500 italic">{token.value}</span>;
-      case 'punctuation':
-        if (token.value === '{' || token.value === '}') {
-          return <span key={i} className="text-[#ffd700] font-semibold">{token.value}</span>;
+      case "key":
+        return (
+          <span key={i} className="text-[#9cdcfe] font-semibold">
+            {token.value}
+          </span>
+        );
+      case "string":
+        return (
+          <span key={i} className="text-[#ce9178]">
+            {token.value}
+          </span>
+        );
+      case "number":
+        return (
+          <span key={i} className="text-[#b5cea8]">
+            {token.value}
+          </span>
+        );
+      case "boolean":
+        return (
+          <span key={i} className="text-[#569cd6] font-bold">
+            {token.value}
+          </span>
+        );
+      case "null":
+        return (
+          <span key={i} className="text-gray-500 italic">
+            {token.value}
+          </span>
+        );
+      case "punctuation":
+        if (token.value === "{" || token.value === "}") {
+          return (
+            <span key={i} className="text-[#ffd700] font-semibold">
+              {token.value}
+            </span>
+          );
         }
-        if (token.value === '[' || token.value === ']') {
-          return <span key={i} className="text-[#da70d6] font-semibold">{token.value}</span>;
+        if (token.value === "[" || token.value === "]") {
+          return (
+            <span key={i} className="text-[#da70d6] font-semibold">
+              {token.value}
+            </span>
+          );
         }
-        return <span key={i} className="text-gray-400">{token.value}</span>;
-      case 'whitespace':
+        return (
+          <span key={i} className="text-gray-400">
+            {token.value}
+          </span>
+        );
+      case "whitespace":
         return <span key={i}>{token.value}</span>;
       default:
-        return <span key={i} className="text-red-400">{token.value}</span>;
+        return (
+          <span key={i} className="text-red-400">
+            {token.value}
+          </span>
+        );
     }
   });
 }
@@ -186,96 +237,106 @@ interface JsonFormFieldInputProps {
   isLast: boolean;
 }
 
-const JsonFormFieldInput: React.FC<JsonFormFieldInputProps> = React.memo(({ 
-  fieldKey,
-  fieldType,
-  value, 
-  placeholder,
-  required,
-  icon,
-  onChange, 
-  disabled,
-  isLast 
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    onChange(fieldKey, e.target.value);
-  };
+const JsonFormFieldInput: React.FC<JsonFormFieldInputProps> = React.memo(
+  ({
+    fieldKey,
+    fieldType,
+    value,
+    placeholder,
+    required,
+    icon,
+    onChange,
+    disabled,
+    isLast,
+  }) => {
+    const [isFocused, setIsFocused] = useState(false);
 
-  const inputBaseStyles = "bg-transparent text-[#ce9178] outline-none border-none p-0 m-0 font-mono text-[12px] leading-relaxed w-full min-w-[100px]";
-  
-  return (
-    <div className="flex items-start py-[2px] group">
-      {/* Line number */}
-      <span className="text-[10px] text-gray-600 w-8 flex-shrink-0 select-none text-right pr-2 pt-[1px] font-mono opacity-50">
-        &nbsp;
-      </span>
-      
-      {/* Indentation */}
-      <span className="text-[#ffd700] font-semibold font-mono text-[12px] mr-1 flex-shrink-0">
-        {"  "}
-      </span>
-      
-      {/* Key with icon */}
-      <span className="text-[#9cdcfe] font-semibold font-mono text-[12px] flex-shrink-0 flex items-center">
-        <span className="mr-1 opacity-70">{icon}</span>
-        "{fieldKey}"
-      </span>
-      
-      {/* Colon */}
-      <span className="text-gray-400 font-mono text-[12px] mx-1 flex-shrink-0">:</span>
-      
-      {/* Value - JSON-styled input field */}
-      <div className="relative flex-1 min-w-0">
-        {fieldType === "textarea" ? (
-          <textarea
-            value={value}
-            onChange={handleChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={placeholder}
-            disabled={disabled}
-            rows={3}
-            className={`${inputBaseStyles} resize-none bg-[#1a1a1a] rounded px-1 py-0.5 border ${
-              isFocused 
-                ? 'border-orange-500/50 bg-[#1e1e1e]' 
-                : 'border-transparent hover:border-[#3e3e42]'
-            } transition-all`}
-            style={{ minHeight: '55px' }}
-          />
-        ) : (
-          <input
-            type={fieldType}
-            value={value}
-            onChange={handleChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={placeholder}
-            disabled={disabled}
-            className={`${inputBaseStyles} bg-[#1a1a1a] rounded px-1 py-0.5 border ${
-              isFocused 
-                ? 'border-orange-500/50 bg-[#1e1e1e]' 
-                : 'border-transparent hover:border-[#3e3e42]'
-            } transition-all`}
-          />
-        )}
-        
-        {/* Required indicator */}
-        {required && !value.trim() && (
-          <span className="absolute -right-1 top-1/2 -translate-y-1/2 text-red-400 text-[10px]">*</span>
+    const handleChange = (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+      onChange(fieldKey, e.target.value);
+    };
+
+    const inputBaseStyles =
+      "bg-transparent text-[#ce9178] outline-none border-none p-0 m-0 font-mono text-[12px] leading-relaxed w-full min-w-[100px]";
+
+    return (
+      <div className="flex items-start py-[2px] group">
+        {/* Line number */}
+        <span className="text-[10px] text-gray-600 w-8 flex-shrink-0 select-none text-right pr-2 pt-[1px] font-mono opacity-50">
+          &nbsp;
+        </span>
+
+        {/* Indentation */}
+        <span className="text-[#ffd700] font-semibold font-mono text-[12px] mr-1 flex-shrink-0">
+          {"  "}
+        </span>
+
+        {/* Key with icon */}
+        <span className="text-[#9cdcfe] font-semibold font-mono text-[12px] flex-shrink-0 flex items-center">
+          <span className="mr-1 opacity-70">{icon}</span>"{fieldKey}"
+        </span>
+
+        {/* Colon */}
+        <span className="text-gray-400 font-mono text-[12px] mx-1 flex-shrink-0">
+          :
+        </span>
+
+        {/* Value - JSON-styled input field */}
+        <div className="relative flex-1 min-w-0">
+          {fieldType === "textarea" ? (
+            <textarea
+              value={value}
+              onChange={handleChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={placeholder}
+              disabled={disabled}
+              rows={3}
+              className={`${inputBaseStyles} resize-none bg-[#1a1a1a] rounded px-1 py-0.5 border ${
+                isFocused
+                  ? "border-orange-500/50 bg-[#1e1e1e]"
+                  : "border-transparent hover:border-[#3e3e42]"
+              } transition-all`}
+              style={{ minHeight: "55px" }}
+            />
+          ) : (
+            <input
+              type={fieldType}
+              value={value}
+              onChange={handleChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={placeholder}
+              disabled={disabled}
+              className={`${inputBaseStyles} bg-[#1a1a1a] rounded px-1 py-0.5 border ${
+                isFocused
+                  ? "border-orange-500/50 bg-[#1e1e1e]"
+                  : "border-transparent hover:border-[#3e3e42]"
+              } transition-all`}
+            />
+          )}
+
+          {/* Required indicator */}
+          {required && !value.trim() && (
+            <span className="absolute -right-1 top-1/2 -translate-y-1/2 text-red-400 text-[10px]">
+              *
+            </span>
+          )}
+        </div>
+
+        {/* Comma (except last field) */}
+        {!isLast && (
+          <span className="text-gray-400 font-mono text-[12px] flex-shrink-0">
+            ,
+          </span>
         )}
       </div>
-      
-      {/* Comma (except last field) */}
-      {!isLast && (
-        <span className="text-gray-400 font-mono text-[12px] flex-shrink-0">,</span>
-      )}
-    </div>
-  );
-});
+    );
+  },
+);
 
-JsonFormFieldInput.displayName = 'JsonFormFieldInput';
+JsonFormFieldInput.displayName = "JsonFormFieldInput";
 
 // ============================================
 // Main Contact Form Component
@@ -291,7 +352,7 @@ export default function ContactApiPlayground({
   theme,
   content,
   triggerTerminalSimulate,
-  openFile
+  openFile,
 }: ContactApiPlaygroundProps) {
   // Refs
   const logsEndRef = useRef<HTMLDivElement>(null);
@@ -301,16 +362,20 @@ export default function ContactApiPlayground({
 
   // Form State
   const [formData, setFormData] = useState<ContactFormFields>({
-    senderName: "John Doe",
-    senderEmail: "john.doe@example.com",
-    senderPhone: "+1 (555) 019-2834",
+    senderName: "First_name Last_name",
+    senderEmail: "youremail@example.com",
+    senderPhone: "+01 XXXXXXXXXX",
     subject: "Collaboration Request",
-    message: "Hello! I would like to discuss a potential collaboration opportunity.",
+    message:
+      "Hello! I would like to discuss a potential collaboration opportunity.",
   });
 
   // Request State
   const [requestUrl, setRequestUrl] = useState(() => {
-    const base = typeof window !== 'undefined' ? window.location.origin : 'https://api.example.com';
+    const base =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "https://api.example.com";
     return `${base}/api/v1/contact`;
   });
 
@@ -326,12 +391,16 @@ export default function ContactApiPlayground({
   });
 
   // UI State
-  const [activeResponseTab, setActiveResponseTab] = useState<"body" | "headers" | "cookies">("body");
+  const [activeResponseTab, setActiveResponseTab] = useState<
+    "body" | "headers" | "cookies"
+  >("body");
   const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [toasts, setToasts] = useState<ToastState[]>([]);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [activeBodyTab, setActiveBodyTab] = useState<"form" | "preview">("form");
+  const [activeBodyTab, setActiveBodyTab] = useState<"form" | "preview">(
+    "form",
+  );
   const [isConsoleOpen, setIsConsoleOpen] = useState(true);
   const [requestPanelHeight, setRequestPanelHeight] = useState(55);
   const [isDragging, setIsDragging] = useState(false);
@@ -381,14 +450,17 @@ export default function ContactApiPlayground({
   }, [formData]);
 
   // Toast management
-  const showToast = useCallback((message: string, type: ToastState["type"] = "success") => {
-    const id = ++toastIdRef.current;
-    setToasts(prev => [...prev.slice(-4), { message, type, id }]);
-  }, []);
+  const showToast = useCallback(
+    (message: string, type: ToastState["type"] = "success") => {
+      const id = ++toastIdRef.current;
+      setToasts((prev) => [...prev.slice(-4), { message, type, id }]);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (toasts.length === 0) return;
-    const timer = setTimeout(() => setToasts(prev => prev.slice(1)), 3000);
+    const timer = setTimeout(() => setToasts((prev) => prev.slice(1)), 3000);
     return () => clearTimeout(timer);
   }, [toasts]);
 
@@ -406,19 +478,23 @@ export default function ContactApiPlayground({
 
   // Handle field changes
   const handleFieldChange = useCallback((key: string, value: string) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   // Copy to clipboard
-  const copyToClipboard = useCallback((text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        setCopiedField(field);
-        showToast("Copied to clipboard", "success");
-        setTimeout(() => setCopiedField(null), 2000);
-      })
-      .catch(() => showToast("Failed to copy", "error"));
-  }, [showToast]);
+  const copyToClipboard = useCallback(
+    (text: string, field: string) => {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setCopiedField(field);
+          showToast("Copied to clipboard", "success");
+          setTimeout(() => setCopiedField(null), 2000);
+        })
+        .catch(() => showToast("Failed to copy", "error"));
+    },
+    [showToast],
+  );
 
   // Send request
   const sendRequest = useCallback(async () => {
@@ -443,13 +519,16 @@ export default function ContactApiPlayground({
 
     const startTime = performance.now();
     const addLog = (message: string) => {
-      setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
+      setLogs((prev) => [
+        ...prev,
+        `[${new Date().toLocaleTimeString()}] ${message}`,
+      ]);
     };
 
     try {
       addLog("Preparing POST request to /api/v1/contact");
       addLog("Fetching CSRF token...");
-      
+
       // FIXED: Get CSRF token before sending
       const csrfToken = getCsrfToken();
       if (!csrfToken) {
@@ -465,7 +544,7 @@ export default function ContactApiPlayground({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,  // ← ADDED CSRF TOKEN
+          "X-CSRF-Token": csrfToken, // ← ADDED CSRF TOKEN
           "X-Request-ID": crypto.randomUUID?.() || Math.random().toString(36),
         },
         body: JSON.stringify({
@@ -478,8 +557,10 @@ export default function ContactApiPlayground({
       const endTime = performance.now();
       const elapsed = Math.round(endTime - startTime);
 
-      addLog(`Response: HTTP ${fetchResponse.status} ${fetchResponse.statusText}`);
-      
+      addLog(
+        `Response: HTTP ${fetchResponse.status} ${fetchResponse.statusText}`,
+      );
+
       const result = await fetchResponse.json();
       const responseBody = JSON.stringify(result, null, 2);
       const responseSize = new Blob([responseBody]).size;
@@ -495,10 +576,16 @@ export default function ContactApiPlayground({
         statusText: fetchResponse.statusText,
         time: elapsed,
         size: `${(responseSize / 1024).toFixed(2)} KB`,
-        headers: responseHeaders.length > 0 ? responseHeaders : [
-          { key: "Content-Type", value: "application/json; charset=utf-8" },
-          { key: "X-Response-Time", value: `${elapsed}ms` },
-        ],
+        headers:
+          responseHeaders.length > 0
+            ? responseHeaders
+            : [
+                {
+                  key: "Content-Type",
+                  value: "application/json; charset=utf-8",
+                },
+                { key: "X-Response-Time", value: `${elapsed}ms` },
+              ],
         body: responseBody,
         cookies: [],
       });
@@ -506,11 +593,16 @@ export default function ContactApiPlayground({
       if (fetchResponse.status === 200 && result.success) {
         addLog("✓ Message delivered successfully via SMTP");
         addLog("✓ Confirmation email queued for sender");
-        showToast("Message sent successfully! I'll get back to you soon.", "success");
+        showToast(
+          "Message sent successfully! I'll get back to you soon.",
+          "success",
+        );
 
         // Store in localStorage
         try {
-          const list = JSON.parse(localStorage.getItem("portfolio_messages") || "[]");
+          const list = JSON.parse(
+            localStorage.getItem("portfolio_messages") || "[]",
+          );
           list.push({
             id: `MSG-${Date.now()}`,
             ...formData,
@@ -523,8 +615,13 @@ export default function ContactApiPlayground({
           console.error("Storage error:", storageErr);
         }
       } else if (fetchResponse.status === 403) {
-        addLog(`⚠ CSRF or verification error: ${result.error || result.message}`);
-        showToast(result.message || "Security check failed. Please refresh the page.", "warning");
+        addLog(
+          `⚠ CSRF or verification error: ${result.error || result.message}`,
+        );
+        showToast(
+          result.message || "Security check failed. Please refresh the page.",
+          "warning",
+        );
       } else {
         addLog(`⚠ Warning: ${result.message || "Check configuration"}`);
         showToast(result.message || "Message sent with warnings", "warning");
@@ -543,11 +640,15 @@ export default function ContactApiPlayground({
         time: Math.round(performance.now() - startTime),
         size: "0 KB",
         headers: [],
-        body: JSON.stringify({
-          success: false,
-          error: "Connection Error",
-          message: err.message,
-        }, null, 2),
+        body: JSON.stringify(
+          {
+            success: false,
+            error: "Connection Error",
+            message: err.message,
+          },
+          null,
+          2,
+        ),
         cookies: [],
       });
 
@@ -560,11 +661,12 @@ export default function ContactApiPlayground({
   // Reset form
   const resetForm = useCallback(() => {
     setFormData({
-      senderName: "John Doe",
-      senderEmail: "john.doe@example.com",
-      senderPhone: "+1 (555) 019-2834",
+      senderName: "First_name Last_name",
+      senderEmail: "youremail@example.com",
+      senderPhone: "+01 XXXXXXXXXX",
       subject: "Collaboration Request",
-      message: "Hello! I would like to discuss a potential collaboration opportunity.",
+      message:
+        "Hello! I would like to discuss a potential collaboration opportunity.",
     });
     setResponse({
       status: null,
@@ -581,13 +683,15 @@ export default function ContactApiPlayground({
   // Save request config
   const saveRequest = useCallback(() => {
     try {
-      const savedList = JSON.parse(localStorage.getItem("saved_api_requests") || "[]");
+      const savedList = JSON.parse(
+        localStorage.getItem("saved_api_requests") || "[]",
+      );
       const requestConfig = {
         id: `REQ-${Date.now()}`,
         endpoint: "/api/v1/contact",
         method: "POST",
         formData: formData,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
       savedList.push(requestConfig);
       localStorage.setItem("saved_api_requests", JSON.stringify(savedList));
@@ -717,10 +821,13 @@ export default function ContactApiPlayground({
       </div>
 
       {/* Main Content */}
-      <div ref={panelsContainerRef} className="flex-1 flex flex-col min-h-0 mt-[84px] overflow-auto">
+      <div
+        ref={panelsContainerRef}
+        className="flex-1 flex flex-col min-h-0 mt-[84px] overflow-auto"
+      >
         {/* Request Panel - JSON-Styled Form */}
         <div
-          style={{ height: `${requestPanelHeight}%`, minHeight: '220px' }}
+          style={{ height: `${requestPanelHeight}%`, minHeight: "220px" }}
           className="border-b border-[#2d2d2d] overflow-auto flex flex-col"
         >
           <div className="h-full flex flex-col">
@@ -758,8 +865,12 @@ export default function ContactApiPlayground({
                 <div className="py-3">
                   {/* Opening brace */}
                   <div className="flex items-start py-[2px]">
-                    <span className="text-[10px] text-gray-600 w-8 flex-shrink-0 select-none text-right pr-2 font-mono opacity-50">1</span>
-                    <span className="text-[#ffd700] font-semibold text-[12px]">{'{'}</span>
+                    <span className="text-[10px] text-gray-600 w-8 flex-shrink-0 select-none text-right pr-2 font-mono opacity-50">
+                      1
+                    </span>
+                    <span className="text-[#ffd700] font-semibold text-[12px]">
+                      {"{"}
+                    </span>
                   </div>
 
                   {/* Form fields as JSON lines */}
@@ -783,12 +894,15 @@ export default function ContactApiPlayground({
                     <span className="text-[10px] text-gray-600 w-8 flex-shrink-0 select-none text-right pr-2 font-mono opacity-50">
                       {contactFields.length + 2}
                     </span>
-                    <span className="text-[#ffd700] font-semibold text-[12px]">{'}'}</span>
+                    <span className="text-[#ffd700] font-semibold text-[12px]">
+                      {"}"}
+                    </span>
                   </div>
 
                   {/* Help text */}
                   <div className="mt-4 px-8 text-[10px] text-gray-500">
-                    <span className="text-[#9cdcfe]">Tip:</span> Fill in your contact details above. Switch to
+                    <span className="text-[#9cdcfe]">Tip:</span> Fill in your
+                    contact details above. Switch to
                     <span className="text-[#ce9178] mx-1">Preview</span>
                     to see the JSON payload, then click
                     <span className="text-white font-semibold mx-1">Send</span>
@@ -799,7 +913,9 @@ export default function ContactApiPlayground({
                 /* JSON Preview */
                 <div className="h-full">
                   <div className="flex items-center justify-between px-3 py-1.5 bg-[#252526] border-b border-[#2d2d2d]">
-                    <span className="text-[10px] text-gray-400">Generated JSON Preview</span>
+                    <span className="text-[10px] text-gray-400">
+                      Generated JSON Preview
+                    </span>
                     <button
                       onClick={() => copyToClipboard(jsonPreview, "preview")}
                       className="p-1 hover:bg-[#3e3e42] rounded transition-colors"
@@ -835,11 +951,15 @@ export default function ContactApiPlayground({
             <div className="flex items-center space-x-3">
               {response.status && (
                 <>
-                  <span className={`text-[11px] font-bold ${
-                    response.status >= 200 && response.status < 300 ? "text-green-400" :
-                    response.status >= 400 && response.status < 500 ? "text-yellow-400" :
-                    "text-red-400"
-                  }`}>
+                  <span
+                    className={`text-[11px] font-bold ${
+                      response.status >= 200 && response.status < 300
+                        ? "text-green-400"
+                        : response.status >= 400 && response.status < 500
+                          ? "text-yellow-400"
+                          : "text-red-400"
+                    }`}
+                  >
                     {response.status} {response.statusText}
                   </span>
                   <span className="text-[10px] text-gray-500 flex items-center">
@@ -856,10 +976,18 @@ export default function ContactApiPlayground({
             <div className="flex-1" />
             {response.body && (
               <div className="flex items-center space-x-1">
-                <button onClick={exportResponse} className="p-1 hover:bg-[#3e3e42] rounded transition-colors" title="Export Response">
+                <button
+                  onClick={exportResponse}
+                  className="p-1 hover:bg-[#3e3e42] rounded transition-colors"
+                  title="Export Response"
+                >
                   <Download className="w-3 h-3 text-gray-400" />
                 </button>
-                <button onClick={() => copyToClipboard(response.body, "response")} className="p-1 hover:bg-[#3e3e42] rounded transition-colors" title="Copy Response">
+                <button
+                  onClick={() => copyToClipboard(response.body, "response")}
+                  className="p-1 hover:bg-[#3e3e42] rounded transition-colors"
+                  title="Copy Response"
+                >
                   {copiedField === "response" ? (
                     <Check className="w-3 h-3 text-green-400" />
                   ) : (
@@ -898,8 +1026,12 @@ export default function ContactApiPlayground({
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
                     <FileJson className="w-10 h-10 mb-2 opacity-30" />
-                    <p className="text-[11px] font-semibold mb-1">No Response Yet</p>
-                    <p className="text-[10px]">Click Send to submit your message</p>
+                    <p className="text-[11px] font-semibold mb-1">
+                      No Response Yet
+                    </p>
+                    <p className="text-[10px]">
+                      Click Send to submit your message
+                    </p>
                   </div>
                 )}
               </div>
@@ -912,15 +1044,26 @@ export default function ContactApiPlayground({
                     <table className="w-full text-[10px] font-mono">
                       <thead>
                         <tr className="bg-[#2d2d2d]">
-                          <th className="text-left px-2 py-1 font-semibold text-gray-300">Header</th>
-                          <th className="text-left px-2 py-1 font-semibold text-gray-300">Value</th>
+                          <th className="text-left px-2 py-1 font-semibold text-gray-300">
+                            Header
+                          </th>
+                          <th className="text-left px-2 py-1 font-semibold text-gray-300">
+                            Value
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {response.headers.map((header, i) => (
-                          <tr key={i} className="border-t border-[#2d2d2d] hover:bg-[#2a2a2e]">
-                            <td className="px-2 py-1 text-yellow-400">{header.key}</td>
-                            <td className="px-2 py-1 text-gray-300 break-all">{header.value}</td>
+                          <tr
+                            key={i}
+                            className="border-t border-[#2d2d2d] hover:bg-[#2a2a2e]"
+                          >
+                            <td className="px-2 py-1 text-yellow-400">
+                              {header.key}
+                            </td>
+                            <td className="px-2 py-1 text-gray-300 break-all">
+                              {header.value}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -928,7 +1071,9 @@ export default function ContactApiPlayground({
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500">
-                    <p className="text-[11px]">Response headers will appear here</p>
+                    <p className="text-[11px]">
+                      Response headers will appear here
+                    </p>
                   </div>
                 )}
               </div>
@@ -942,16 +1087,20 @@ export default function ContactApiPlayground({
           </div>
 
           {/* Console */}
-          <div className={`border-t border-[#2d2d2d] bg-[#1a1a1a] overflow-hidden flex flex-col flex-shrink-0 transition-all duration-200 ${
-            isConsoleOpen ? "h-28" : "h-[26px]"
-          }`}>
-            <div 
+          <div
+            className={`border-t border-[#2d2d2d] bg-[#1a1a1a] overflow-hidden flex flex-col flex-shrink-0 transition-all duration-200 ${
+              isConsoleOpen ? "h-28" : "h-[26px]"
+            }`}
+          >
+            <div
               onClick={() => setIsConsoleOpen(!isConsoleOpen)}
               className="flex items-center px-3 py-1 bg-[#202021] border-b border-[#2d2d2d]/30 min-h-[25px] cursor-pointer hover:bg-[#2a2a2e]/60 transition-colors select-none"
             >
               <div className="flex items-center space-x-1.5">
                 <Terminal className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Console</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Console
+                </span>
                 {logs.length > 0 && (
                   <span className="ml-1 bg-orange-500/15 text-orange-400 px-1.5 py-0.5 rounded-full text-[9px] font-bold font-mono leading-none">
                     {logs.length}
@@ -959,20 +1108,28 @@ export default function ContactApiPlayground({
                 )}
               </div>
               <button
-                onClick={(e) => { e.stopPropagation(); setLogs([]); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLogs([]);
+                }}
                 className="ml-auto text-[10px] text-gray-500 hover:text-gray-300 transition-colors px-1 hover:underline"
               >
                 Clear
               </button>
             </div>
-            
+
             {isConsoleOpen && (
               <div className="flex-1 p-2 overflow-y-auto text-[10px] font-mono text-gray-400 custom-scrollbar bg-[#161617]/95">
                 {logs.length === 0 ? (
-                  <span className="text-gray-600">Execution logs will appear here...</span>
+                  <span className="text-gray-600">
+                    Execution logs will appear here...
+                  </span>
                 ) : (
                   logs.map((log, i) => (
-                    <div key={i} className="py-0.5 leading-relaxed hover:bg-neutral-800/10 px-1 border-l border-transparent hover:border-orange-500/30">
+                    <div
+                      key={i}
+                      className="py-0.5 leading-relaxed hover:bg-neutral-800/10 px-1 border-l border-transparent hover:border-orange-500/30"
+                    >
                       {log}
                     </div>
                   ))
@@ -988,17 +1145,28 @@ export default function ContactApiPlayground({
       <div className="fixed bottom-4 right-4 z-50 space-y-1.5">
         {toasts.map((toast) => (
           <div key={toast.id} className="animate-slide-up">
-            <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg shadow-2xl border text-[11px] font-semibold ${
-              toast.type === "success" ? "bg-green-900/95 border-green-700 text-green-200" :
-              toast.type === "error" ? "bg-red-900/95 border-red-700 text-red-200" :
-              toast.type === "warning" ? "bg-yellow-900/95 border-yellow-700 text-yellow-200" :
-              "bg-blue-900/95 border-blue-700 text-blue-200"
-            }`}>
-              {toast.type === "success" && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
-              {toast.type === "error" && <X className="w-3.5 h-3.5 flex-shrink-0" />}
+            <div
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg shadow-2xl border text-[11px] font-semibold ${
+                toast.type === "success"
+                  ? "bg-green-900/95 border-green-700 text-green-200"
+                  : toast.type === "error"
+                    ? "bg-red-900/95 border-red-700 text-red-200"
+                    : toast.type === "warning"
+                      ? "bg-yellow-900/95 border-yellow-700 text-yellow-200"
+                      : "bg-blue-900/95 border-blue-700 text-blue-200"
+              }`}
+            >
+              {toast.type === "success" && (
+                <Check className="w-3.5 h-3.5 flex-shrink-0" />
+              )}
+              {toast.type === "error" && (
+                <X className="w-3.5 h-3.5 flex-shrink-0" />
+              )}
               <span className="flex-1">{toast.message}</span>
               <button
-                onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+                onClick={() =>
+                  setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+                }
                 className="flex-shrink-0 hover:text-white transition-colors"
               >
                 <X className="w-3 h-3" />
