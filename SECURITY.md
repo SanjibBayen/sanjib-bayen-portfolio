@@ -158,7 +158,7 @@ Client                    Server                   Cloudflare
 | Control | Implementation | Data Collected |
 |---------|----------------|----------------|
 | **Browser Fingerprinting** | `express-useragent` | Browser family, OS, engine version |
-| **Geo-IP Lookup** | `geoip-lite` | Country, Region, City (from IP) |
+| **Geo-IP Lookup** | Zero-dependency CDN Geolocation headers | Country, Region, City (parsed from Vercel / Cloudflare headers) |
 | **Request Metadata** | Cloudflare Ray ID | Request tracing, abuse correlation |
 
 > **Privacy Note:** Geo-IP and user-agent data are processed server-side for security telemetry. No PII is stored persistently. IP addresses are not logged to disk.

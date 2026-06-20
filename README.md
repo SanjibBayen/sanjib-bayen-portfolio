@@ -130,7 +130,7 @@ Traditional portfolio sites are static and passive. This platform transforms the
 | Feature | Implementation |
 |---------|----------------|
 | **Cryptographic Gate** | Cloudflare Turnstile verification before workspace access |
-| **Geo-IP Telemetry** | Server-side location parsing via `geoip-lite` |
+| **Geo-IP Telemetry** | Server-side location parsing via high-performance CDN edge headers (Vercel / Cloudflare / Render) |
 | **Browser Identification** | UA parsing via `express-useragent` |
 | **Hardened Headers** | Helmet.js with strict CSP, frame protection, and fingerprinting prevention |
 
@@ -173,7 +173,7 @@ Traditional portfolio sites are static and passive. This platform transforms the
 |---------|---------|
 | **helmet** | Security headers (CSP, X-Frame, etc.) |
 | **express-useragent** | Browser/OS parsing & scraper blocking |
-| **geoip-lite** | IP-to-location lookup |
+| **CDN Geo Headers** | Lightweight zero-dependency edge location mapping (Vercel & Cloudflare) |
 | **hpp** | HTTP Parameter Pollution prevention |
 | **compression** | Gzip/deflate response compression |
 
@@ -276,55 +276,65 @@ src/server.ts   ──esbuild─►  dist/server.cjs
 ```
 interactive-ide-portfolio/
 │
-├── public/                          # Static assets
+├── api/                             # Express Backend (Micro-Service Layer)
+│   └── src/
+│       ├── app.ts                   # Express Application setup (CSP, Helmet, CORS, routing)
+│       ├── server.ts                # Port listener and process shutdown routines
+│       ├── config/
+│       │   └── index.ts             # Configuration schemas and environment validation
+│       ├── controllers/
+│       │   ├── contact.controller.ts # Contact form handler via Resend
+│       │   └── security.controller.ts # Handlers for Turnstile, CSRF, and IP Info
+│       ├── middleware/
+│       │   ├── bot.ts               # Bot & automated crawler blocker
+│       │   ├── csrf.ts              # Stateless cryptographic token verification
+│       │   ├── geo.ts               # Zero-dependency CDN Geolocation mapping
+│       │   ├── ids.ts               # Simple signature-based intrusion detection
+│       │   ├── rateLimiter.ts       # Endpoint throttling and brute force protection
+│       │   ├── securityHeaders.ts    # Secure headers, cookies & browser fingerprints
+│       │   └── turnstile.middleware.ts # Access gates for non-verified sessions
+│       ├── routes/
+│       │   └── api.routes.ts        # API v1 routes gateway
+│       ├── services/
+│       │   ├── email.service.ts     # Resend client wrapper
+│       │   ├── emailTemplates.ts    # Contact response HTML templates
+│       │   └── turnstile.service.ts # Cloudflare siteverify challenge service
+│       └── utils/
+│           ├── logger.ts            # Security events and audit log stream
+│           ├── security.utils.ts    # Cryptographic hashes and sign utils
+│           └── spamDetector.ts      # Simple contact message heuristic score limits
+│
+├── public/                          # Static browser assets
 │   ├── favicon.ico
 │   └── robots.txt
 │
-├── src/
-│   ├── client/                      # React Frontend
-│   │   ├── components/
-│   │   │   ├── layout/
-│   │   │   │   ├── ActivityBar.tsx
-│   │   │   │   ├── SidebarPanel.tsx
-│   │   │   │   ├── EditorPanel.tsx
-│   │   │   │   └── TerminalPanel.tsx
-│   │   │   │
-│   │   │   ├── gates/
-│   │   │   │   └── SecurityGate.tsx        # Turnstile barrier
-│   │   │   │
-│   │   │   └── shared/
-│   │   │       ├── Tabs.tsx
-│   │   │       └── TreeView.tsx
-│   │   │
-│   │   ├── contexts/
-│   │   │   ├── VFSContext.tsx              # Virtual File System state
-│   │   │   ├── TabContext.tsx              # Editor tab management
-│   │   │   └── ThemeContext.tsx            # Theme engine provider
-│   │   │
-│   │   ├── hooks/
-│   │   │   ├── useTerminalCore.ts          # Terminal command evaluation
-│   │   │   ├── useVFS.ts                   # File system operations
-│   │   │   └── useTheme.ts                 # Theme switching
-│   │   │
-│   │   ├── data/
-│   │   │   ├── vfs.ts                      # Default VFS tree
-│   │   │   └── themes.ts                   # Theme definitions
-│   │   │
-│   │   ├── types/
-│   │   │   └── index.ts                    # TypeScript interfaces
-│   │   │
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   │
-│   └── server.ts                     # Express Backend (Single Entry)
+├── src/                             # Single-Page Frontend (React 19 / Vite)
+│   ├── assets/                      # Fluid SVGs and graphic templates
+│   ├── components/                  # Global shared UI components
+│   ├── data/                        # Static app and configuration definitions
+│   ├── features/                    # Modular domain components
+│   │   ├── about/                   # About & Resume terminal panels
+│   │   ├── contact/                 # Contact form components
+│   │   ├── projects/                # Work & project viewers
+│   │   ├── research/                # Research terminal viewer
+│   │   ├── security/                # Cryptographic challenge (Security Gate)
+│   │   │   ├── components/          # SecurityGate & MobileGate layout overlays
+│   │   │   ├── hooks/               # useTurnstile and state connectors
+│   │   │   ├── services/            # SecurityService fetch APIs
+│   │   │   └── types/               # Type schemas for security features
+│   │   ├── skills/                  # Core competency visualizers
+│   │   ├── terminal/                # Terminal tab, command logs & core handlers
+│   │   └── workspace/               # ActivityBar, SidebarPanel & Editor tabs
+│   ├── index.css                    # Tailwind CSS definitions
+│   ├── main.tsx                     # React application launcher
+│   └── App.tsx                      # Primary DOM and gateway gate router
 │
-├── .env.example                      # Environment variable template
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── SECURITY.md                       # Security policy & vulnerability reporting
-└── README.md                         # This file
+├── server.ts                        # Unified Root Router (Bridging Vercel & Render)
+├── vercel.json                      # Vercel configuration (headers & serverless APIs)
+├── vite.config.ts                   # Vite client compilation parameters
+├── tsconfig.json                    # Type compiler parameters
+├── SECURITY.md                      # Security model and vulnerability reporting
+└── README.md                        # This file
 ```
 
 ### Key Type Definitions
